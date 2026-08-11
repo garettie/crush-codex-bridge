@@ -33,16 +33,19 @@ Crush  ->  http://127.0.0.1:8787/v1  ->  Codex
 Clone the repository and link the CLI:
 
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/garettie/crush-codex-bridge.git
 cd crush-codex-bridge
 npm link
 ```
 
-Pick a private key that Crush will use when talking to the local bridge:
+Pick a private key that Crush will use when talking to the local bridge. Save it in your shell profile so Crush and the bridge receive the same value after you open a new terminal:
 
 ```bash
-export BRIDGE_API_KEY="$(openssl rand -hex 24)"
+printf '\nexport BRIDGE_API_KEY="%s"\n' "$(openssl rand -hex 24)" >> ~/.bashrc
+source ~/.bashrc
 ```
+
+Replace `~/.bashrc` with your shell's profile file, such as `~/.zshrc`, when needed. You do not need a `.env` file.
 
 Sign in, check the session, and start the bridge:
 
@@ -62,7 +65,16 @@ Generate a provider snippet:
 crush-codex-bridge config > /tmp/crush-codex.json
 ```
 
-Merge the generated `providers.openai-codex` and `models` entries into your Crush configuration, usually at `~/.config/crush/crush.json`.
+Crush can read either `~/.config/crush/crushrc` or `~/.config/crush/crush.json`. The Bash-based `crushrc` format is preferred, but the bridge currently generates JSON.
+
+If you do not have a Crush configuration yet, install the generated file directly:
+
+```bash
+mkdir -p ~/.config/crush
+cp /tmp/crush-codex.json ~/.config/crush/crush.json
+```
+
+If `~/.config/crush/crush.json` already exists, do not overwrite it. Open both files, then copy the generated `providers.openai-codex` entry and the generated `models` entries into the matching top-level objects in your existing file. Keep one `providers` object and one `models` object, and add commas between neighboring JSON entries. Restart Crush after saving.
 
 The provider looks like this:
 
@@ -126,7 +138,7 @@ On other platforms, keep `crush-codex-bridge start` running in a terminal or use
 
 ## Configuration
 
-Copy `.env.example` if you want a reference. The CLI reads environment variables directly; it does not load `.env` files itself.
+`.env.example` is a reference, not a required file. The CLI reads environment variables directly and does not load `.env` files. Put persistent values in your shell profile, or export them in the terminal before running the bridge.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
