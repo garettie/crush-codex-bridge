@@ -1,0 +1,8 @@
+node_modules/
+.env
+*.log
+.local/
+.crush/
+.ijfw/
+ijfw/
+.DS_Store
